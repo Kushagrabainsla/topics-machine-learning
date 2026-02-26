@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning — Study Q&A</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #151518;
+    --border: #2a2a30;
+    --accent: #e8c96e;
+    --accent2: #6eb5e8;
+    --accent3: #e86e8a;
+    --text: #e8e6df;
+    --muted: #888;
+    --correct: #6ee8a0;
+    --tag-bg: #1e1e24;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 200px;
+    background: radial-gradient(ellipse, rgba(232,201,110,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  header h1 span { color: var(--accent); }
+  header p {
+    color: var(--muted);
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 1.2rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.6rem;
+    color: var(--accent);
+    font-weight: 500;
+    display: block;
+  }
+  .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* FILTER TABS */
+  .filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1.5rem 2rem;
+    flex-wrap: wrap;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .filter-btn {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--accent);
+    color: #0d0d0f;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* MAIN CONTENT */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+  }
+
+  /* SECTION HEADERS */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  /* Q&A CARDS */
+  .qa-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .qa-card:hover { border-color: #3a3a44; }
+  .qa-card.answered { border-left: 3px solid var(--correct); }
+
+  .qa-question {
+    padding: 1.2rem 1.4rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    user-select: none;
+  }
+  .qa-question:hover { background: rgba(255,255,255,0.02); }
+
+  .q-left { display: flex; gap: 1rem; align-items: flex-start; flex: 1; }
+  .q-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+  }
+  .q-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .q-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.4rem; }
+  .q-tag {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .tag-concept { background: rgba(110,181,232,0.15); color: var(--accent2); }
+  .tag-formula { background: rgba(232,201,110,0.15); color: var(--accent); }
+  .tag-practical { background: rgba(110,232,160,0.15); color: var(--correct); }
+  .tag-tricky { background: rgba(232,110,138,0.15); color: var(--accent3); }
+
+  .toggle-icon {
+    color: var(--muted);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    transition: transform 0.25s;
+    margin-top: 0.1rem;
+  }
+  .qa-card.open .toggle-icon { transform: rotate(45deg); }
+
+  /* ANSWER PANEL */
+  .qa-answer {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 1.4rem;
+    background: rgba(255,255,255,0.015);
+  }
+  .qa-card.open .qa-answer { display: block; animation: fadeIn 0.2s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .answer-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--correct);
+    font-weight: 500;
+    margin-bottom: 0.7rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .answer-body {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #ccc;
+  }
+  .answer-body strong { color: var(--text); font-weight: 500; }
+  .answer-body em { color: var(--accent); font-style: normal; font-family: 'DM Mono', monospace; font-size: 0.88em; }
+  .answer-body .formula {
+    display: block;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.8rem 1.1rem;
+    margin: 0.8rem 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    overflow-x: auto;
+  }
+  .answer-body ul {
+    padding-left: 1.2rem;
+    margin: 0.5rem 0;
+  }
+  .answer-body li { margin-bottom: 0.3rem; }
+  .answer-body .insight {
+    background: rgba(232,201,110,0.07);
+    border-left: 3px solid var(--accent);
+    padding: 0.7rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin-top: 0.8rem;
+    font-size: 0.88rem;
+    color: #bbb;
+  }
+  .answer-body .insight::before {
+    content: '💡 ';
+  }
+
+  /* PROGRESS */
+  .progress-container {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--border);
+    z-index: 100;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 600px) {
+    .stats-bar { gap: 1.5rem; }
+    .qa-question { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+
+<header>
+  <h1>Deep Learning <span>Q&A</span></h1>
+  <p>CS 271 · Comprehensive Study Guide · Pages 1 – 232</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-num">40</span><span class="stat-label">Questions</span></div>
+  <div class="stat"><span class="stat-num">10</span><span class="stat-label">Topics</span></div>
+  <div class="stat"><span class="stat-num" id="openCount">0</span><span class="stat-label">Reviewed</span></div>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="filterCards('all')">All Topics</button>
+  <button class="filter-btn" onclick="filterCards('ml-basics')">ML Basics</button>
+  <button class="filter-btn" onclick="filterCards('linear-model')">Linear Model</button>
+  <button class="filter-btn" onclick="filterCards('loss')">Loss Functions</button>
+  <button class="filter-btn" onclick="filterCards('optimization')">Optimization</button>
+  <button class="filter-btn" onclick="filterCards('network')">Neural Networks</button>
+  <button class="filter-btn" onclick="filterCards('activation')">Activations</button>
+  <button class="filter-btn" onclick="filterCards('backprop')">Backprop</button>
+  <button class="filter-btn" onclick="filterCards('overfitting')">Overfitting</button>
+  <button class="filter-btn" onclick="filterCards('sgd')">SGD & Momentum</button>
+  <button class="filter-btn" onclick="filterCards('adaptive')">Adaptive LR</button>
+</div>
+
+<main id="mainContent">
+
+<!-- ===================== ML BASICS ===================== -->
+<div class="section-title"><span class="dot"></span>Machine Learning Basics</div>
+
+<div class="qa-card" data-topic="ml-basics">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q01</span>
+      <div><div class="q-text">What is Mitchell's definition of machine learning, and what are its three components?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Mitchell defines ML as: <strong>"A computer program is said to learn from experience E with respect to some class of tasks T and performance measure P, if its performance at T, as measured by P, improves with experience E."</strong>
+      <ul>
+        <li><strong>Task (T):</strong> What the program is doing — e.g., classifying images, predicting prices. A task involves <em>examples</em>, and each example is a collection of <em>features</em>.</li>
+        <li><strong>Experience (E):</strong> The data the program is exposed to — its training set.</li>
+        <li><strong>Performance (P):</strong> How we measure success — accuracy, loss, F1 score, etc.</li>
+      </ul>
+      <div class="insight">The key is the word "improves" — the program must get better at T as it sees more of E. That's what separates ML from hard-coded software.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="ml-basics">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q02</span>
+      <div><div class="q-text">What's the difference between classification and regression? Give the mathematical function signature for each.</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <strong>Classification</strong> maps inputs to one of k discrete categories:
+      <span class="formula">f : ℝⁿ → {1, 2, ..., k}</span>
+      The labels are <em>unordered</em> — "cat" is not greater than "dog". The model often outputs a probability distribution over classes.
+      <br><br>
+      <strong>Regression</strong> maps inputs to a continuous numerical value:
+      <span class="formula">f : ℝⁿ → ℝ</span>
+      The labels <em>can be compared</em> — predicting apartment price (250k) is "more" than predicting (200k).
+      <div class="insight">Rule of thumb: if your output has a natural ordering and you care about how far off you are, use regression. If you just need to assign a category, use classification.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="ml-basics">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q03</span>
+      <div><div class="q-text">What is the difference between training error and generalization error? Why does the distinction matter?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <strong>Training error</strong> is the loss measured on the data the model trained on. We can minimize this through optimization.
+      <br><br>
+      <strong>Generalization error (test error)</strong> is the expected error on <em>new, unseen</em> inputs — what actually matters in practice.
+      <br><br>
+      The distinction matters because a model can memorize training data perfectly (training error = 0) while failing completely on new data. That's overfitting. True ML is about generalization, not memorization.
+      <div class="insight">The gap between training error and generalization error is the key diagnostic signal: large gap = overfitting, both high = underfitting.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="ml-basics">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q04</span>
+      <div><div class="q-text">What are the four types of ML, and what characterizes each?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <ul>
+        <li><strong>Supervised:</strong> Inputs + labeled outputs. You minimize a <em>loss function</em>. Used for classification and regression.</li>
+        <li><strong>Unsupervised:</strong> Only inputs, no labels. The algorithm must find patterns on its own (e.g., clustering). Good for data labeling tasks.</li>
+        <li><strong>Semi-supervised:</strong> A small amount of labeled data combined with a large amount of unlabeled data. Often outperforms supervised learning when labeled data is scarce.</li>
+        <li><strong>Reinforcement:</strong> An agent acts in an environment and receives rewards or penalties. The objective is to maximize a <em>reward function</em> — think of training a dog with treats.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== LINEAR MODEL ===================== -->
+<div class="section-title"><span class="dot"></span>The Linear Model</div>
+
+<div class="qa-card" data-topic="linear-model">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q05</span>
+      <div><div class="q-text">Write the general linear model formula and explain what each term means in an ML context.</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <span class="formula">f(x) = xw + b</span>
+      <ul>
+        <li><strong>x</strong> — the input vector (features). E.g., apartment size, distance to university.</li>
+        <li><strong>w</strong> — the weight vector. Each weight scales how much its corresponding input contributes to the output. Found by optimization.</li>
+        <li><strong>b</strong> — the bias (intercept). A constant offset. Also found by optimization.</li>
+        <li><strong>f(x)</strong> — the predicted output (e.g., apartment price).</li>
+      </ul>
+      When x is a 1×2 vector (2 inputs) and w is 2×1, the dot product gives a scalar output. For multiple outputs, w becomes a matrix.
+      <div class="insight">Negative weights are meaningful. If distance to campus has a negative weight, farther distance → lower predicted price, which makes sense.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="linear-model">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q06</span>
+      <div><div class="q-text">If a model has 3 inputs and 2 outputs, how many weights and biases are there?</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <span class="formula"># weights = # inputs × # outputs = 3 × 2 = 6</span>
+      <span class="formula"># biases = # outputs = 2</span>
+      Each output has its own linear model, so each input connects to each output with a separate weight. Each output neuron also has its own bias. Total parameters: 6 + 2 = <strong>8</strong>.
+    </div>
+  </div>
+</div>
+
+<!-- ===================== LOSS FUNCTIONS ===================== -->
+<div class="section-title"><span class="dot"></span>Loss Functions</div>
+
+<div class="qa-card" data-topic="loss">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q07</span>
+      <div><div class="q-text">What is the difference between MSE and MAE, and when should you prefer each?</div>
+      <div class="q-tags"><span class="q-tag tag-practical">Practical</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <span class="formula">MSE = (1/N) Σ (yᵢ − tᵢ)²</span>
+      <span class="formula">MAE = (1/N) Σ |yᵢ − tᵢ|</span>
+      <strong>MSE</strong> squares errors, so large errors are penalized <em>disproportionately</em>. It's smooth and differentiable everywhere, making gradient descent easy. But it's sensitive to outliers — one bad prediction inflates the loss.
+      <br><br>
+      <strong>MAE</strong> penalizes all errors proportionally. It's more robust to outliers but has a non-differentiable point at 0 (subgradients are used instead).
+      <div class="insight">Use MSE when outliers are rare and errors should be penalized heavily. Use MAE when your dataset is noisy or has extreme values you don't want to dominate training.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="loss">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q08</span>
+      <div><div class="q-text">Explain how cross-entropy loss works. Calculate it for Y=[0.4, 0.4, 0.2], T=[0,1,0].</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div><div class="q-tags"><span class="q-tag tag-tricky">Tricky</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <span class="formula">L(y, t) = −Σᵢ tᵢ · ln(yᵢ)</span>
+      Cross-entropy measures how surprised you are by the prediction, given the true label. Because T is one-hot (only one class is 1, rest are 0), the formula collapses to just <em>−ln(probability assigned to the correct class)</em>.
+      <br><br>
+      For Y=[0.4, 0.4, 0.2], T=[0,1,0]: the true class is index 1 (Pear), and the model gave it 0.4:
+      <span class="formula">L = −(0·ln0.4 + 1·ln0.4 + 0·ln0.2) = −ln(0.4) ≈ 0.92</span>
+      Compare to Y=[0.1, 0.8, 0.1], T=[0,1,0]: L = −ln(0.8) ≈ 0.22. Much lower — closer to the truth.
+      <div class="insight">Cross-entropy punishes confident wrong predictions extremely harshly because ln(probability near 0) → −∞. This is what makes it great for classification.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="loss">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q09</span>
+      <div><div class="q-text">What is Huber Loss, and what problem does it solve compared to MSE and MAE?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Huber Loss blends MSE and MAE using a threshold δ:
+      <span class="formula">L_δ(α) = ½α²           if |α| ≤ δ (MSE zone)
+             δ·(|α| − ½δ)    if |α| > δ (MAE zone)</span>
+      where α = yᵢ − tᵢ.
+      <br><br>
+      For small errors (below δ), it behaves like MSE — smooth gradients, precise convergence. For large errors (outliers, above δ), it behaves like MAE — linear growth, capping the influence of extreme values.
+      <div class="insight">Huber Loss is the best of both worlds: precision for normal errors, robustness against outliers. δ is a hyperparameter you tune — higher δ = more like MSE, lower δ = more like MAE.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="loss">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q10</span>
+      <div><div class="q-text">What is Hinge Loss and what makes it special among classification losses?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <span class="formula">L(y, t) = max(0, 1 − t·y)</span>
+      Used in Support Vector Machines for <em>maximum-margin</em> classification. The targets t are −1 or +1, and y is the raw model score.
+      <br><br>
+      The loss is <strong>zero</strong> only when the prediction is correct <em>and</em> confident enough (|y| ≥ 1 with the right sign). If the model is correct but not by a large enough margin, there's still a penalty.
+      <div class="insight">This "margin" requirement is the key insight of SVMs: don't just classify correctly, classify with confidence. The decision boundary is pushed as far away from all data points as possible.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== OPTIMIZATION ===================== -->
+<div class="section-title"><span class="dot"></span>Optimization & Gradient Descent</div>
+
+<div class="qa-card" data-topic="optimization">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q11</span>
+      <div><div class="q-text">Explain the gradient descent update rule and intuitively why moving opposite the gradient minimizes the loss.</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div><div class="q-tags"><span class="q-tag tag-formula">Formula</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <span class="formula">xᵢ₊₁ = xᵢ − η · f'(xᵢ)</span>
+      The gradient (f') points in the direction of steepest <em>increase</em>. To minimize, we go the opposite way. The learning rate η controls step size.
+      <br><br>
+      Imagine you're on a hilly landscape in fog. The gradient tells you which direction is uphill. Walking in the opposite direction means walking downhill — toward a valley (minimum).
+      <br><br>
+      We stop when <em>f'(x) ≈ 0</em> — the update becomes: xᵢ₊₁ = xᵢ − 0, so we stop moving.
+      <div class="insight">The directional derivative proof confirms this: the direction that decreases f fastest is exactly −∇f (opposite the gradient), giving the most negative directional derivative.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="optimization">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q12</span>
+      <div><div class="q-text">What is oscillation in gradient descent, and what causes it?</div>
+      <div class="q-tags"><span class="q-tag tag-tricky">Tricky</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Oscillation occurs when the learning rate η is too large. Instead of converging to a minimum, the update rule "overshoots" — jumps past the minimum to the other side, then jumps back, forever bouncing without converging.
+      <br><br>
+      Intuition: imagine trying to walk to the bottom of a narrow valley. With tiny steps, you zigzag down gently. With giant steps, you leap from one wall to the other, never reaching the bottom.
+      <div class="insight">The two rules for choosing η: high enough to reach the minimum in reasonable time, low enough to avoid oscillation. In practice: start at η = 0.01–0.001 and tune from there.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="optimization">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q13</span>
+      <div><div class="q-text">What is a saddle point, and why are they more common than local minima in deep learning?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      A <strong>saddle point</strong> is a stationary point (gradient = 0) that is a minimum in some directions and a maximum in others. The Hessian has both positive and negative eigenvalues (indefinite matrix).
+      <br><br>
+      In deep learning with millions of parameters, the probability of <em>every</em> direction being a minimum (true local minimum) is astronomically small. Almost all stationary points are saddle points. However, this isn't catastrophic:
+      <ul>
+        <li>In high dimensions, there's almost always an escape direction from a saddle point.</li>
+        <li>Most local minima found in large networks have loss values close to the global minimum anyway.</li>
+        <li>Noise from mini-batches helps escape shallow saddle points.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="optimization">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q14</span>
+      <div><div class="q-text">Why is computing the full Hessian matrix impractical for deep networks?</div>
+      <div class="q-tags"><span class="q-tag tag-practical">Practical</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      The Hessian is an n×n matrix of all second-order partial derivatives, where n is the number of parameters.
+      <br><br>
+      For a network with 10⁶ parameters: the Hessian has 10¹² entries. For 10⁹ parameters: 10¹⁸ entries. Memory and compute cost grow <em>quadratically</em> with model size — completely infeasible for modern networks.
+      <br><br>
+      Alternatives exist (L-BFGS, K-FAC, Hessian-vector products) but are rarely used for large-scale training. The geometry of deep learning loss surfaces is itself so complex that second-order methods rarely provide enough benefit to justify the cost.
+      <div class="insight">This is why gradient descent (which is O(n)) became the foundation of deep learning — it scales linearly with the number of parameters.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="optimization">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q15</span>
+      <div><div class="q-text">Write the N-dimensional gradient descent update rules for weights and biases.</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <span class="formula">wᵢ₊₁ = wᵢ − η · ∇ᵥᵥ L(y, t)
+bᵢ₊₁ = bᵢ − η · ∇ᵦ L(y, t)</span>
+      Where the gradients are:
+      <span class="formula">∇ᵥᵥ L(y, t) = Σᵢ xᵢ δᵢ
+∇ᵦ L(y, t) = Σᵢ δᵢ</span>
+      And δᵢ = yᵢ − tᵢ is the error (delta) for each training sample.
+      <div class="insight">The weight gradient is the input scaled by the error — large input + large error = large weight update. The bias gradient is just the sum of errors, with no input scaling.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== NEURAL NETWORKS ===================== -->
+<div class="section-title"><span class="dot"></span>Neural Networks & Architecture</div>
+
+<div class="qa-card" data-topic="network">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q16</span>
+      <div><div class="q-text">Why is non-linearity (activation function) essential in neural networks? What happens without it?</div>
+      <div class="q-tags"><span class="q-tag tag-tricky">Tricky</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Without activation functions, stacking layers collapses to a single linear transformation:
+      <span class="formula">h = x · w₁    →    y = h · w₂ = x · w₁ · w₂ = x · w'</span>
+      No matter how many layers you add, the product of matrices is still a matrix. A 10-layer "deep" network without activations is functionally equivalent to a single linear layer — it can only model linear relationships.
+      <br><br>
+      Non-linearities break this — they make each layer's output non-linear, allowing the composition of layers to model arbitrarily complex functions (curves, spirals, any shape).
+      <div class="insight">Activation functions are the ingredient that makes depth meaningful. They're why "deep" learning is fundamentally different from a simple linear regression.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="network">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q17</span>
+      <div><div class="q-text">What is the softmax function, where should it be used, and why NOT in hidden layers?</div>
+      <div class="q-tags"><span class="q-tag tag-practical">Practical</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <span class="formula">softmax(aₖ) = e^aₖ / Σₖ' e^aₖ'</span>
+      Softmax takes a vector of raw scores (logits) and converts them to a valid probability distribution: all outputs are in [0,1] and sum to exactly 1.
+      <br><br>
+      <strong>Where to use it:</strong> Output layer of multi-class classification networks, paired with cross-entropy loss.
+      <br><br>
+      <strong>Why NOT hidden layers:</strong> Softmax normalizes relative to all other activations in the same layer. This destroys information about the absolute magnitudes and creates competition between neurons, compressing the variability of the data. Hidden layers need to preserve that variability so later layers can learn from it.
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="network">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q18</span>
+      <div><div class="q-text">What are hyperparameters, and how do they differ from parameters like weights and biases?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <strong>Parameters</strong> (weights, biases) are learned automatically through optimization — gradient descent updates them during training.
+      <br><br>
+      <strong>Hyperparameters</strong> are set manually before training and not learned by the optimizer. They include: width (neurons per layer), depth (number of layers), learning rate η, batch size, momentum coefficient α, decay coefficient c, and more.
+      <div class="insight">Hyperparameters are "settings" you must choose. Parameters are "answers" the model finds. Tuning hyperparameters is itself an optimization problem, just one you solve by experimentation rather than calculus.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ACTIVATION FUNCTIONS ===================== -->
+<div class="section-title"><span class="dot"></span>Activation Functions</div>
+
+<div class="qa-card" data-topic="activation">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q19</span>
+      <div><div class="q-text">What is the vanishing gradient problem, and which activation functions suffer from it?</div>
+      <div class="q-tags"><span class="q-tag tag-tricky">Tricky</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      In backpropagation, gradients are multiplied together as they flow backward through layers (chain rule). If any layer's activation function has a derivative close to zero (i.e., it's saturated), the gradient for earlier layers becomes exponentially small — it <em>vanishes</em>.
+      <br><br>
+      <strong>Sigmoid</strong> saturates for large positive OR negative inputs (output → 1 or → 0), and its max derivative is only 0.25. Gradients shrink with each layer.
+      <br><br>
+      <strong>TanH</strong> is better (zero-centered), but still saturates on both sides.
+      <br><br>
+      <strong>Leaky ReLU</strong> also has a vanishing gradient problem when most weights are negative (repeated multiplication by 0.01).
+      <div class="insight">ReLU was revolutionary precisely because it avoids vanishing gradients in the positive range — its derivative is always 1 for positive inputs. This is why deep networks became trainable.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="activation">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q20</span>
+      <div><div class="q-text">What is the "Dying ReLU" problem and how does Leaky ReLU fix it?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <strong>ReLU:</strong> output = max(0, x). For negative inputs, ReLU outputs 0 and has derivative 0. If a neuron's weights get updated such that it always receives negative input, its gradient is always 0 → weights never update → the neuron is "dead" and never recovers.
+      <br><br>
+      <strong>Leaky ReLU</strong> fixes this by giving a small slope (α = 0.01) to negative inputs instead of 0:
+      <span class="formula">f(x) = x     if x ≥ 0
+f(x) = α·x  if x < 0  (α ≈ 0.01)</span>
+      Now dead neurons still get a small gradient and can potentially recover.
+      <br><br>
+      <strong>PReLU (Parametric ReLU)</strong> takes this further by making α a learnable parameter — the network decides the optimal slope for negative inputs.
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="activation">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q21</span>
+      <div><div class="q-text">Compare GELU and SiLU/Swish. When is each preferred?</div>
+      <div class="q-tags"><span class="q-tag tag-practical">Practical</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Both are modern smooth activation functions that partially suppress negative values rather than zeroing them (unlike ReLU).
+      <br><br>
+      <strong>GELU</strong> uses a probabilistic gating mechanism based on the Gaussian CDF. Small negatives are partially suppressed, not fully zeroed. It's the standard in transformer-based NLP models (BERT, GPT). Better empirical performance in large models, but computationally expensive.
+      <br><br>
+      <strong>SiLU/Swish:</strong> x · σ(x) — multiplies the input by its own sigmoid. Cheaper than GELU while capturing similar smooth behavior. Used in modern CNNs and vision models.
+      <div class="insight">GELU → NLP/transformers. SiLU → CNNs/vision. Both beat ReLU in large models, but ReLU is still fine and fast for simpler architectures.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== BACKPROPAGATION ===================== -->
+<div class="section-title"><span class="dot"></span>Backpropagation</div>
+
+<div class="qa-card" data-topic="backprop">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q22</span>
+      <div><div class="q-text">Explain backpropagation intuitively. What problem does it solve that forward propagation alone can't?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <strong>The problem:</strong> In a deep network, the output error is clear (predicted − target). But how much did each hidden layer weight <em>contribute</em> to that error? We can't see that directly.
+      <br><br>
+      <strong>Forward propagation</strong> pushes inputs through the network to get predictions.
+      <br><br>
+      <strong>Backpropagation</strong> then pushes the error <em>backwards</em> through the network using the chain rule of calculus. Each weight gets assigned a "blame" proportional to how much it contributed to the final error. Weights that caused large errors get larger updates.
+      <div class="insight">Think of it as a manager attributing blame after a project failure: the manager (output layer) knows the overall failure, and backprop traces back to find which team members (weights) were most responsible.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="backprop">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q23</span>
+      <div><div class="q-text">Why is weight initialization important, and what goes wrong with all-equal initialization?</div>
+      <div class="q-tags"><span class="q-tag tag-tricky">Tricky</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <strong>If all weights are equal:</strong> every hidden node in a layer receives the same weighted sum of inputs → produces the same output. During backprop, every weight gets the same gradient → updates are identical → weights remain equal forever. The network is symmetric and all neurons in a layer effectively act as one. No useful learning occurs.
+      <br><br>
+      This is called the <em>symmetry problem</em>. We must <strong>break symmetry</strong> by initializing weights randomly.
+      <br><br>
+      But random values must also be in the right range — too large causes exploding activations/gradients; too small collapses everything toward zero (and linear regions of sigmoid).
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="backprop">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q24</span>
+      <div><div class="q-text">Explain Xavier/Glorot initialization. What condition does it satisfy and why?</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      The insight: for a layer's output to have the same variance as its input (so activations don't blow up or die), we need:
+      <span class="formula">n_in · σ² = 1   (forward pass)
+n_out · σ² = 1  (backward pass)</span>
+      Satisfying both simultaneously:
+      <span class="formula">σ² = 2 / (n_in + n_out)</span>
+      <strong>Normal Xavier:</strong> draw from N(0, σ²) where σ = √(2 / (n_in + n_out))
+      <br>
+      <strong>Uniform Xavier:</strong> draw from U(−x, x) where x = √(6 / (n_in + n_out))
+      <br><br>
+      This is the default initializer in TensorFlow and most modern frameworks.
+      <div class="insight">Xavier init ensures signal strength is maintained as it flows both forward (predictions) and backward (gradients). Without it, you might need thousands more epochs to converge — if at all.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== OVERFITTING ===================== -->
+<div class="section-title"><span class="dot"></span>Overfitting & Regularization</div>
+
+<div class="qa-card" data-topic="overfitting">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q25</span>
+      <div><div class="q-text">What is bias-variance tradeoff? Map it to underfitting and overfitting.</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <strong>Bias:</strong> the difference between predicted value and expected (true) value. High bias = the model is systematically wrong, missing the underlying pattern → <em>underfitting</em>.
+      <br><br>
+      <strong>Variance:</strong> how much the model's predictions change between the training set and the test set. High variance = model is sensitive to the specific training data, capturing noise → <em>overfitting</em>.
+      <br><br>
+      The tradeoff: reducing bias (more complex model) usually increases variance, and vice versa. A good model finds the sweet spot.
+      <div class="insight">An overfitting model has high accuracy on training data but fails on test data (high variance). An underfitting model does poorly on both (high bias). Your goal is low bias AND low variance.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="overfitting">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q26</span>
+      <div><div class="q-text">What are the roles of training, validation, and test sets? Can you make model decisions based on the test set?</div>
+      <div class="q-tags"><span class="q-tag tag-practical">Practical</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <ul>
+        <li><strong>Training set (~70-80%):</strong> Used to learn the model parameters (weights, biases) through backprop.</li>
+        <li><strong>Validation set (~10-20%):</strong> Used to tune hyperparameters and monitor for overfitting during training. Run in forward-pass only (no weight updates).</li>
+        <li><strong>Test set (~10%):</strong> Used once at the very end to estimate true generalization error. This is your model's "report card."</li>
+      </ul>
+      <strong>No</strong>, you should never make decisions (hyperparameter choices, architecture choices) based on the test set. If you do, the test set effectively becomes a validation set, and you no longer have an honest estimate of generalization.
+      <div class="insight">The test set is sacred. Looking at it and then adjusting your model introduces "data leakage" — your model is indirectly trained on it.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="overfitting">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q27</span>
+      <div><div class="q-text">What is early stopping and what are the two conditions that should trigger it?</div>
+      <div class="q-tags"><span class="q-tag tag-practical">Practical</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Early stopping terminates training before a fixed number of epochs to prevent overfitting. The two conditions:
+      <span class="formula">Stop if: (Vᵢ₊₁ > Vᵢ)  ← validation loss starts increasing
+         OR: (|Xᵢ₊₁ − Xᵢ| < 0.001)  ← training loss stops improving</span>
+      where V = validation loss, X = training loss.
+      <br><br>
+      The key diagnostic is <em>validation loss increasing while training loss continues to decrease</em> — this is the signature of overfitting. The model is getting better at the training set but worse at generalizing.
+      <div class="insight">Simply fixing epoch count is naive. Early stopping is a form of regularization that doesn't require changing the model architecture at all.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SGD & MOMENTUM ===================== -->
+<div class="section-title"><span class="dot"></span>SGD, Mini-batches & Momentum</div>
+
+<div class="qa-card" data-topic="sgd">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q28</span>
+      <div><div class="q-text">What is the difference between Gradient Descent, Stochastic GD, and Mini-batch GD?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <ul>
+        <li><strong>Gradient Descent (Batch GD):</strong> Uses the <em>entire</em> training set to compute the gradient before each update. Precise but extremely slow — one update per epoch.</li>
+        <li><strong>Stochastic GD (true SGD):</strong> Uses a <em>single sample</em> for each update. Very noisy (high variance), but fast. Updates weights N times per epoch (N = dataset size).</li>
+        <li><strong>Mini-batch GD:</strong> Uses a small <em>batch</em> (e.g., 32, 128, or 1024 samples) for each update. Best of both worlds — less noise than true SGD, far faster than full batch GD. This is what "SGD" means in practice.</li>
+      </ul>
+      <div class="insight">Mini-batch GD allows parallel computation on GPUs (multiple samples at once) and the noise from incomplete batches helps escape shallow local minima. It's the standard approach in all deep learning frameworks.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="sgd">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q29</span>
+      <div><div class="q-text">Explain momentum in gradient descent. Write the update rule and explain what α=0.9 means physically.</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Momentum tracks a running average of past gradients to smooth updates and accelerate traversal of flat regions:
+      <span class="formula">M(t) = α·M(t−1) + gₜ
+θₜ₊₁ = θₜ − η·M(t)</span>
+      where gₜ = η·∇L(θₜ) is the current gradient step.
+      <br><br>
+      This is an Exponentially Weighted Moving Average (EWMA). Expanding it:
+      <span class="formula">M(t) = Σᵣ αᵣ gₜ₋ᵣ</span>
+      In the limit, the effective scaling of the gradient is 1/(1−α):
+      <ul>
+        <li>α = 0: no memory, scaling = 1</li>
+        <li>α = 0.9: short memory, scaling = 10</li>
+        <li>α = 0.99: long memory, scaling = 100</li>
+      </ul>
+      With α = 0.9, we effectively take steps 10× larger in consistent gradient directions — like a ball rolling downhill and picking up speed.
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="sgd">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q30</span>
+      <div><div class="q-text">What is Nesterov momentum, and what problem does it solve over standard momentum?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Standard momentum can overshoot valleys — it "looks back" at where it was and carries that velocity forward, but doesn't look ahead to see if it's about to hit a wall.
+      <br><br>
+      <strong>Nesterov</strong> computes the gradient at the <em>predicted future position</em> (θ + α·M(t−1)) rather than the current position:
+      <span class="formula">M(t) = α·M(t−1) − η·∇L(θₜ + α·M(t−1))
+θₜ₊₁ = θₜ + M(t)</span>
+      By "looking ahead," Nesterov can slow down before reaching a minimum instead of overshooting it, reducing oscillation.
+      <div class="insight">However, Nesterov can be slower than standard gradient descent in practice, and can even be unstable if α or η are poorly set. It's a refinement, not always an improvement.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ADAPTIVE LR ===================== -->
+<div class="section-title"><span class="dot"></span>Adaptive Learning Rate Methods</div>
+
+<div class="qa-card" data-topic="adaptive">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q31</span>
+      <div><div class="q-text">What do the Robbins-Monro conditions require of a decaying learning rate schedule, and why?</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      For stochastic gradient descent to converge, the learning rate schedule must satisfy:
+      <span class="formula">1. ηₜ → 0      (rate must go to zero)
+2. Σ ηₜ = ∞    (sum diverges — enough total distance)
+   Σ ηₜ² < ∞   (sum of squares converges — steps get small)</span>
+      <strong>Condition 1</strong>: If the learning rate never goes to zero, you keep bouncing around near the minimum without settling.
+      <br>
+      <strong>Condition 2 (Σ ηₜ = ∞)</strong>: The total amount you can travel must be unlimited — otherwise you might get "stuck" before reaching the minimum.
+      <br>
+      <strong>Condition 3 (Σ ηₜ² < ∞)</strong>: Individual steps must shrink so you eventually stop moving.
+      <div class="insight">Exponential decay (ηₜ = η₀ · e^(−t/c)) satisfies all these conditions and is the practical go-to. Step decay (naive) technically works too, but is brittle.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="adaptive">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q32</span>
+      <div><div class="q-text">What is the one-cycle (warmup) learning rate schedule and what is the intuition behind starting small?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      The one-cycle schedule has three phases:
+      <ul>
+        <li><strong>Phase 1 — Warmup:</strong> Start with a tiny η and rapidly increase it.</li>
+        <li><strong>Phase 2 — Peak:</strong> Hold at or near the max learning rate.</li>
+        <li><strong>Phase 3 — Decay:</strong> Gradually decrease η back toward zero.</li>
+      </ul>
+      <strong>Why start small?</strong> At the very start of training, weights are random and gradients are unreliable. A large learning rate on noisy gradients would send the model in random directions. Starting small allows the model to get its bearings before taking big exploratory steps.
+      <div class="insight">The warmup phase is now standard in training large transformer models (BERT, GPT). It's especially important when fine-tuning — jumping to a large learning rate immediately can destroy the pre-trained knowledge.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="adaptive">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q33</span>
+      <div><div class="q-text">How does AdaGrad work, and what is its fatal flaw?</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div><div class="q-tags"><span class="q-tag tag-tricky">Tricky</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      AdaGrad gives each weight its own adaptive learning rate by dividing by the square root of all past squared gradients:
+      <span class="formula">Δwᵢ(t) = −η / √(Gᵢ(t) + ε) · ∂L/∂wᵢ
+Gᵢ(t) = Gᵢ(t−1) + (∂L/∂wᵢ)²   [cumulative sum]</span>
+      Weights with historically large gradients get a smaller effective η (they're already well-explored). Rare/small-gradient weights keep a large η (more room to explore).
+      <br><br>
+      <strong>Fatal flaw:</strong> Gᵢ(t) is <em>monotonically increasing</em> — it only grows, never shrinks. Eventually, the denominator becomes so large that the effective learning rate → 0, and training completely stalls. AdaGrad "learns" itself to death.
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="adaptive">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q34</span>
+      <div><div class="q-text">How does RMSProp fix AdaGrad's problem? What is the role of β?</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      RMSProp replaces AdaGrad's cumulative sum with an <strong>Exponentially Weighted Moving Average (EWMA)</strong>:
+      <span class="formula">Gᵢ(t) = β·Gᵢ(t−1) + (1−β)·(∂L/∂wᵢ)²</span>
+      With β ≈ 0.9, old gradients fade out exponentially. Gᵢ(t) no longer grows forever — it stabilizes around the <em>recent</em> gradient magnitude. Training won't stall.
+      <br><br>
+      <strong>β controls memory length:</strong> β close to 1 = long memory (slow to forget); β close to 0 = short memory (reacts quickly to recent gradients). Default: β ≈ 0.9.
+      <div class="insight">RMSProp and AdaGrad have identical update rules — the only difference is how G is computed. This one change from cumulative sum to EWMA makes AdaGrad usable in practice.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="adaptive">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q35</span>
+      <div><div class="q-text">Explain ADAM. What two concepts does it combine, and what are the recommended default hyperparameters?</div>
+      <div class="q-tags"><span class="q-tag tag-formula">Formula</span></div><div class="q-tags"><span class="q-tag tag-practical">Practical</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      ADAM combines <strong>momentum</strong> (first moment) with <strong>RMSProp</strong> (second moment):
+      <span class="formula">Mᵢ(t) = α·Mᵢ(t−1) + (1−α)·∇L   ← momentum (1st moment)
+Gᵢ(t) = β·Gᵢ(t−1) + (1−β)·(∂L/∂wᵢ)²  ← RMSProp (2nd moment)
+Δwᵢ(t) = −(η / √(Gᵢ(t)+ε)) · Mᵢ(t)</span>
+      <strong>Default hyperparameters:</strong>
+      <ul>
+        <li>η = 0.001</li>
+        <li>α = 0.9 (momentum)</li>
+        <li>β = 0.999 (RMSProp decay)</li>
+        <li>ε = 10⁻⁶ (numerical stability)</li>
+      </ul>
+      <div class="insight">ADAM is the default optimizer for almost everything in modern deep learning. Start here. It's fast, robust, and requires minimal hyperparameter tuning. β=0.999 means the second moment tracks gradient magnitude very slowly, giving stable estimates even when gradients are noisy.</div>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="adaptive">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q36</span>
+      <div><div class="q-text">What convergence issue can ADAM have, and what alternatives were proposed to fix it?</div>
+      <div class="q-tags"><span class="q-tag tag-tricky">Tricky</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Reddi et al. (2018) showed that ADAM can fail to converge even on simple <em>convex</em> problems. The issue: the EWMA for G can "forget" large but infrequent gradients too quickly. This causes the algorithm to take steps in wrong directions periodically, preventing true convergence.
+      <br><br>
+      <strong>Proposed fixes:</strong>
+      <ul>
+        <li><strong>AMSGrad:</strong> Instead of EWMA, keeps a running <em>maximum</em> of G, ensuring it never decreases and large gradients are never forgotten.</li>
+        <li><strong>PADAM:</strong> Partially adaptive — a compromise between SGD and ADAM's adaptivity.</li>
+        <li><strong>YOGI:</strong> Modifies how G is updated to control the growth of the second moment more carefully.</li>
+      </ul>
+      <div class="insight">In practice, ADAM still works remarkably well on most deep learning tasks. These convergence issues tend to matter more in theoretical settings or highly specific optimization problems.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MIXED / SYNTHESIS ===================== -->
+<div class="section-title"><span class="dot"></span>Synthesis & Tricky Questions</div>
+
+<div class="qa-card" data-topic="ml-basics">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q37</span>
+      <div><div class="q-text">An overfitting model shows 99% training accuracy and 55% test accuracy. What does that tell you, and what could you try?</div>
+      <div class="q-tags"><span class="q-tag tag-practical">Practical</span></div><div class="q-tags"><span class="q-tag tag-tricky">Tricky</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      The large training-test gap (99% vs 55%) is a textbook overfitting signature — high variance. The model memorized training data including noise, instead of learning the underlying pattern.
+      <br><br>
+      <strong>Things to try:</strong>
+      <ul>
+        <li><strong>Early stopping:</strong> Monitor validation loss and stop before it diverges.</li>
+        <li><strong>Regularization:</strong> Add dropout, L2 weight decay, or other techniques to constrain the model.</li>
+        <li><strong>Reduce model complexity:</strong> Fewer layers (less depth) or fewer neurons per layer (less width).</li>
+        <li><strong>More training data:</strong> More diverse examples make it harder to memorize.</li>
+        <li><strong>Data augmentation:</strong> Artificially expand the training set.</li>
+        <li><strong>Increase batch size:</strong> Noisier gradients can help escape overfitting regimes.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="optimization">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q38</span>
+      <div><div class="q-text">Why does deep learning's high-dimensional loss landscape actually help optimization, rather than hurt it?</div>
+      <div class="q-tags"><span class="q-tag tag-tricky">Tricky</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      Counterintuitively, high dimensionality helps in three ways:
+      <ul>
+        <li><strong>Saddle point escape:</strong> At a saddle point in 2D, there are only 2 directions to check — you might be trapped. In 10⁸ dimensions, at least some directions will point downhill, making escape almost guaranteed.</li>
+        <li><strong>Good local minima:</strong> Research shows that most local minima in large networks have loss values very close to the global minimum. Even if you don't find the global minimum, the local one is good enough.</li>
+        <li><strong>SGD noise acts as exploration:</strong> Mini-batch noise effectively adds random perturbations, helping the model escape shallow, bad local minima and find wider, more generalizable valleys.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="activation">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q39</span>
+      <div><div class="q-text">Why do we prefer non-saturating activation functions in deep networks? What does "saturated" mean?</div>
+      <div class="q-tags"><span class="q-tag tag-concept">Concept</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <strong>Saturated</strong> means the activation function's output stops changing meaningfully for large input values. The function "flattens out" — its derivative approaches zero.
+      <br><br>
+      For sigmoid: outputs are squashed between 0 and 1. For inputs like +5 or +10, the outputs are both ≈ 1 — the gradient is near zero. During backprop, these near-zero gradients get multiplied together across layers, causing the vanishing gradient problem. Early layers effectively stop learning.
+      <br><br>
+      <strong>Non-saturating functions</strong> (ReLU, Leaky ReLU, GELU, SiLU) maintain non-zero gradients in most of their input range, allowing gradients to flow freely through deep networks.
+    </div>
+  </div>
+</div>
+
+<div class="qa-card" data-topic="adaptive">
+  <div class="qa-question" onclick="toggle(this)">
+    <div class="q-left">
+      <span class="q-num">Q40</span>
+      <div><div class="q-text">List all hyperparameters covered in the course and categorize what each controls.</div>
+      <div class="q-tags"><span class="q-tag tag-practical">Practical</span></div></div>
+    </div>
+    <span class="toggle-icon">+</span>
+  </div>
+  <div class="qa-answer">
+    <div class="answer-label">Answer</div>
+    <div class="answer-body">
+      <strong>Architecture:</strong>
+      <ul>
+        <li><em>Width</em> — number of hidden units per layer (more = more expressiveness, more risk of overfitting)</li>
+        <li><em>Depth</em> — number of hidden layers (deeper = learns higher-level features)</li>
+      </ul>
+      <strong>Optimization:</strong>
+      <ul>
+        <li><em>Learning rate η</em> — step size in gradient descent</li>
+        <li><em>Batch size</em> — samples per gradient update (larger = stable but slower, smaller = noisy but faster)</li>
+        <li><em>Momentum coefficient α</em> — how much past gradients influence current step (usually 0.9)</li>
+        <li><em>Decay coefficient c</em> — controls how fast learning rate decays in exponential schedule</li>
+      </ul>
+      <strong>Adaptive optimizer specific:</strong>
+      <ul>
+        <li><em>β</em> (RMSProp/ADAM) — decay for second moment (~0.999 in ADAM)</li>
+        <li><em>ε</em> (ADAM) — numerical stability constant (~10⁻⁶)</li>
+      </ul>
+      <div class="insight">With ADAM, you often only need to tune η and leave the rest at defaults. This is one reason ADAM is so popular — it dramatically reduces the hyperparameter tuning burden.</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  Deep Learning CS 271 · Study Guide · 40 Questions across 10 Topics
+</footer>
+
+<script>
+  let openSet = new Set();
+
+  function toggle(btn) {
+    const card = btn.closest('.qa-card');
+    const isOpen = card.classList.contains('open');
+    if (isOpen) {
+      card.classList.remove('open', 'answered');
+      openSet.delete(card);
+    } else {
+      card.classList.add('open', 'answered');
+      openSet.add(card);
+    }
+    updateCount();
+    updateProgress();
+  }
+
+  function updateCount() {
+    document.getElementById('openCount').textContent = openSet.size;
+  }
+
+  function updateProgress() {
+    const total = document.querySelectorAll('.qa-card').length;
+    const pct = (openSet.size / total) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  function filterCards(topic) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    document.querySelectorAll('.qa-card').forEach(card => {
+      if (topic === 'all' || card.dataset.topic === topic) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    document.querySelectorAll('.section-title').forEach(s => {
+      if (topic !== 'all') s.style.display = 'none';
+      else s.style.display = '';
+    });
+  }
+</script>
+</body>
+</html>
